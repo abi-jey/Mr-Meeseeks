@@ -46,6 +46,8 @@ function createMainWindow() {
     mainWindow.maximize();
     mainWindow.loadFile('src/ui/index.html');
 
+    const { systemPreferences } = require('electron');
+
     // Auto-grant permissions
     mainWindow.webContents.session.setPermissionRequestHandler((webContents, permission, callback) => {
         if (permission === 'media') {
@@ -53,6 +55,17 @@ function createMainWindow() {
         }
         callback(false);
     });
+
+    // MacOS explicit permission check
+    if (process.platform === 'darwin') {
+        const checkPerms = async () => {
+            const micStatus = systemPreferences.getMediaAccessStatus('microphone');
+            if (micStatus === 'not-determined') {
+                await systemPreferences.askForMediaAccess('microphone');
+            }
+        };
+        checkPerms();
+    }
 
     // Mouse polling logic
     startMousePolling = function () {

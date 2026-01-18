@@ -99,15 +99,14 @@ const aiStudioLink = document.getElementById('openAiStudioLink');
 if (aiStudioLink) {
     aiStudioLink.addEventListener('click', (e) => {
         e.preventDefault();
-        // Open browser
-        // We need an openExternal exposed or just use standard window.open if allowed?
-        // Electron renderer usually blocks new windows.
-        // Let's rely on standard anchor if target blank?
-        // Actually best to use shell.popenExternal from main or similar.
-        // Since we didn't expose openExternal, let's assume user can copy paste or we use the `openSessionFolder` hack? No.
-        // Just let them type it.
-        // Or if we want to be helpful:
         window.open('https://aistudio.google.com/app/apikey', '_blank');
+    });
+}
+
+const openSettingsBtn = document.getElementById('openSettingsBtn');
+if (openSettingsBtn) {
+    openSettingsBtn.addEventListener('click', () => {
+        showView('config');
     });
 }
 
