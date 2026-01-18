@@ -1,3 +1,8 @@
+!dist/Mr-Meeseeks-1.0.0-mac.zip
+!dist/Mr-Meeseeks-1.0.0.AppImage
+!dist/Mr-Meeseeks-1.0.0-mac.zip.blockmap
+sessions
+recording**
 # Logs
 logs
 *.log

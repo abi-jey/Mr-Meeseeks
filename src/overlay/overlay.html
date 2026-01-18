@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overlay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            background: transparent;
+            /* Feature 1.2: Red gradient border */
+            box-sizing: border-box;
+            box-shadow: inset 0 0 20px 20px rgba(255, 0, 0, 0.5);
+            pointer-events: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        @keyframes pulseBorder {
+            0% {
+                opacity: 0.3;
+                box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.3);
+            }
+
+            50% {
+                opacity: 0.8;
+                box-shadow: inset 0 0 50px rgba(255, 0, 0, 0.6);
+            }
+
+            100% {
+                opacity: 0.3;
+                box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.3);
+            }
+        }
+
+        .border-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* border removed */
+            box-shadow: inset 0 0 40px red;
+            z-index: 1000;
+            pointer-events: none;
+            animation: pulseBorder 2s infinite ease-in-out;
+        }
+
+        /* Mouse Circle */
+        .mouse-circle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(59, 130, 246, 0.8);
+            background: rgba(59, 130, 246, 0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 3000;
+            transform: translate(-50%, -50%);
+            transition: top 0.05s linear, left 0.05s linear;
+            /* Smooth interpolation */
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+            display: none;
+            /* Show only when tracking */
+        }
+
+        /* Message Box */
+        .message-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            /* Centered */
+            /* More transparent background */
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem 3rem;
+            /* Larger padding */
+            color: #f1f5f9;
+            font-size: 1.5rem;
+            /* Bigger font */
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+            z-index: 4000;
+            pointer-events: auto;
+            /* Allow hover */
+            transition: opacity 0.3s, transform 0.3s;
+            max-width: 600px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .close-btn:hover {
+            color: white;
+        }
+
+        .action-btn {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            color: #fca5a5;
+            padding: 0.75rem 2rem;
+            border-radius: 9999px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .action-btn:hover {
+            background: rgba(239, 68, 68, 0.4);
+            color: white;
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+            transform: translateY(-2px);
+        }
+
+        /* Glassmorphism Hover */
+        .message-box:hover {
+            background: rgba(15, 23, 42, 0.6);
+            border-color: rgba(255, 255, 255, 0.3);
+            cursor: default;
+        }
+
+        /* Notifications (Pills) */
+        .notification-container {
+            position: fixed;
+            top: 20px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            z-index: 5000;
+            pointer-events: none;
+        }
+
+        .message {
+            background-color: rgba(0, 0, 0, 0.8);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 9999px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+        }
+
+        .message.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="border-layer"></div>
+    <div class="mouse-circle" id="mouseCircle"></div>
+
+    <div class="message-box" id="msgBox">
+        <button class="close-btn" id="closeMsgBtn">&times;</button>
+        <div>
+            <span id="typewriterText"></span><span class="cursor">|</span>
+        </div>
+    </div>
+
+    <div class="notification-container" id="notifications"></div>
+
+    <script>
+        const mouseCircle = document.getElementById('mouseCircle');
+        const msgBox = document.getElementById('msgBox');
+        const closeMsgBtn = document.getElementById('closeMsgBtn');
+        const endBtn = document.getElementById('overlayEndSessionBtn');
+        const twText = document.getElementById('typewriterText');
+        const container = document.getElementById('notifications');
+
+        // Mouse Update
+        window.electronAPI.onUpdateMousePos((pos) => {
+            mouseCircle.style.display = 'block';
+            mouseCircle.style.left = pos.x + 'px';
+            mouseCircle.style.top = pos.y + 'px';
+        });
+
+        // Close Button
+        closeMsgBtn.addEventListener('click', () => {
+            msgBox.style.display = 'none';
+        });
+
+        // End Session Button
+        endBtn.addEventListener('click', () => {
+            window.electronAPI.stopSession();
+        });
+
+        // Backend Toggle
+        window.electronAPI.onToggleMessageBox((shouldShow) => {
+            if (shouldShow === undefined) {
+                // Toggle
+                msgBox.style.display = (msgBox.style.display === 'none') ? 'flex' : 'none';
+            } else {
+                msgBox.style.display = shouldShow ? 'flex' : 'none';
+            }
+        });
+
+        // Typewriter Effect
+        let typeInterval;
+
+        function startTyping(text) {
+            const twText = document.getElementById('typewriterText');
+            twText.innerHTML = ''; // Clear existing
+            document.querySelector('.cursor').style.display = 'inline-block';
+
+            let charIndex = 0;
+            if (typeInterval) clearInterval(typeInterval);
+
+            typeInterval = setInterval(() => {
+                if (charIndex < text.length) {
+                    twText.innerHTML += text.charAt(charIndex);
+                    charIndex++;
+                } else {
+                    clearInterval(typeInterval);
+                    // Blink cursor for a bit then hide? or keep blinking
+                }
+            }, 50);
+        }
+
+        window.electronAPI.onTypeMessage((text) => {
+            // Ensure visible
+            if (msgBox.style.display === 'none') msgBox.style.display = 'flex';
+            startTyping(text);
+        });
+
+        // Removed auto-start logic
+        // setTimeout(typeWriter, 1000);
+
+        // Hide message box on right click or special interaction? 
+        // For now, keep it visible.
+
+        // Notifications
+        window.electronAPI.onShowNotification((text) => {
+            const msg = document.createElement('div');
+            msg.className = 'message';
+            msg.innerText = text;
+            container.appendChild(msg);
+            requestAnimationFrame(() => msg.classList.add('visible'));
+            setTimeout(() => {
+                msg.classList.remove('visible');
+                setTimeout(() => msg.remove(), 300);
+            }, 3000);
+        });
+    </script>
+</body>
+
+</html>

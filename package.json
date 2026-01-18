@@ -1,0 +1,41 @@
+{
+  "name": "mr-meeseeks",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron . --no-sandbox",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "electron-builder install-app-deps",
+    "build": "electron-builder --linux AppImage --mac dir"
+  },
+  "build": {
+    "appId": "com.mrmeeseeks.app",
+    "productName": "Mr-Meeseeks",
+    "asar": false,
+    "linux": {
+      "target": "AppImage",
+      "icon": "assets/icon.svg",
+      "category": "Utility"
+    }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abi-jey/Mr-Meeseeks.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abi-jey/Mr-Meeseeks/issues"
+  },
+  "homepage": "https://github.com/abi-jey/Mr-Meeseeks#readme",
+  "devDependencies": {
+    "electron": "^40.0.0",
+    "electron-builder": "^26.4.0"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.24.1",
+    "@nut-tree-fork/nut-js": "^4.2.6"
+  }
+}
