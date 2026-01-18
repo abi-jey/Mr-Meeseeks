@@ -158,18 +158,24 @@
         }
 
         .session-header {
-            width: 100%;
+            position: fixed;
+            bottom: 25%;
+            /* Middle of 50h and end (approx 75%) */
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
             padding: 1rem 2rem;
-            background: rgba(15, 23, 42, 0.9);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.6);
+            /* More transparent pill */
+            backdrop-filter: blur(8px);
+            border-radius: 50px;
             display: flex;
             justify-content: center;
-            gap: 3rem;
+            gap: 2rem;
             align-items: center;
-            border-top: 1px solid var(--border-color);
-            /* Changed to top border */
-            box-sizing: border-box;
-            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 100;
         }
 
         .video-wrapper {
