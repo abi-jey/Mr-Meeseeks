@@ -39,7 +39,7 @@ function createMainWindow() {
             nodeIntegration: false,
             contextIsolation: true
         },
-        icon: path.join(__dirname, 'assets/icon.svg')
+        icon: path.join(__dirname, 'assets/icon.png')
     });
 
     Menu.setApplicationMenu(null);

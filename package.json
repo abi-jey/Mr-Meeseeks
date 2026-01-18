@@ -13,9 +13,12 @@
     "appId": "com.mrmeeseeks.app",
     "productName": "Mr-Meeseeks",
     "asar": false,
+    "mac": {
+      "icon": "assets/icon.png"
+    },
     "linux": {
       "target": "AppImage",
-      "icon": "assets/icon.svg",
+      "icon": "assets/icon.png",
       "category": "Utility"
     }
   },
@@ -36,6 +39,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
-    "@nut-tree-fork/nut-js": "^4.2.6"
+    "@nut-tree-fork/nut-js": "^4.2.6",
+    "sharp": "^0.34.5"
   }
 }
